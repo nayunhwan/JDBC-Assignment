@@ -90,12 +90,12 @@ public class Test2 {
 
         System.out.println("--------------------------------------");
         System.out.println("Problem7: 'D’제조업체의 PRINTER중 컬러 출력이 가능한 제품의 모델과 타입 (아래 그림에 없지만 포함) 가격을 보여라.");
-        sqlStr = "select printer.model, price from printer join product on printer.model = product.model where maker = 'D' and color='true'";
+        sqlStr = "select printer.model, price, printer.type from printer join product on printer.model = product.model where maker = 'D' and color='true'";
         stmt = dbTest.prepareStatement(sqlStr);
         rs = stmt.executeQuery();
 
         while(rs.next()){
-            System.out.println("Model: " + rs.getString("model") + " | " + "Price: " + rs.getString("price"));
+            System.out.println("Model: " + rs.getString("model") + " | " + "Price: " + rs.getString("price") + " | " + "Type: " + rs.getString("type"));
         }
 
         rs.close();
