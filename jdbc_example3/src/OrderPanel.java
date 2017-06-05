@@ -2,6 +2,7 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.sql.Connection;
 
 /**
  * Created by nayunhwan on 2017. 6. 4..
@@ -17,8 +18,10 @@ public class OrderPanel extends JPanel {
     JButton btnCancle = new JButton("취소");
     JButton btnPay = new JButton("결제");
 
-    OrderPanel() {
+    private static Connection db;
 
+    OrderPanel(Connection db) {
+        this.db = db;
         this.setBorder(new TitledBorder("주문 내역"));
         this.setLayout(null);
         tareaOrder.setEditable(false);

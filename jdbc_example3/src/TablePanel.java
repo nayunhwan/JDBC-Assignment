@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.sql.Connection;
 
 /**
  * Created by nayunhwan on 2017. 5. 27..
@@ -8,7 +9,10 @@ import java.awt.*;
 public class TablePanel extends JPanel {
     JButton tables[] = new JButton[20];
 
-    public TablePanel() {
+    private static Connection db;
+
+    public TablePanel(Connection db) {
+        this.db = db;
         this.setLayout(new GridLayout(4, 5));
         this.setBorder(new TitledBorder("테이블 현황"));
         for (int i = 0; i < 20; i++) {

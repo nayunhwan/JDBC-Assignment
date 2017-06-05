@@ -1,6 +1,9 @@
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
 
 /**
  * Created by nayunhwan on 2017. 6. 4..
@@ -13,7 +16,10 @@ public class TabCustomer extends JPanel {
     JButton btnSign = new JButton("가입");
     JButton btnFind = new JButton("조회");
 
-    TabCustomer() {
+    private static Connection db;
+
+    TabCustomer(Connection db) {
+        this.db = db;
         this.setLayout(null);
         labelCustomerName.setBounds(15, 15, 100, 30);
         inputCustomerName.setBounds(15, 50, 100, 30);
@@ -22,7 +28,12 @@ public class TabCustomer extends JPanel {
 
         btnSign.setBounds(180, 50, 60, 30);
         btnFind.setBounds(250, 50, 60, 30);
-
+        btnFind.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+            }
+        });
         this.add(labelCustomerName);
         this.add(inputCustomerName);
         this.add(btnSign);
