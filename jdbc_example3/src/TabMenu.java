@@ -44,6 +44,7 @@ public class TabMenu extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     addMenu();
+                    dispose();
                 }
             });
             btnCancel.setBounds(130, 120, 100, 30);
@@ -54,15 +55,29 @@ public class TabMenu extends JPanel {
                 }
             });
 
-            add(labelMenuName);
-            add(labelPrice);
-            add(inputMenuName);
-            add(inputPrice);
-            add(btnAdd);
-            add(btnCancel);
+            this.add(labelMenuName);
+            this.add(labelPrice);
+            this.add(inputMenuName);
+            this.add(inputPrice);
+            this.add(btnAdd);
+            this.add(btnCancel);
 
             this.setBounds(150, 150, 270, 200);
             this.setVisible(true);
+        }
+
+
+        private int getMenuCount() {
+            String sqlStr = "Select Count(id) from menu";
+            int n = 0;
+            try {
+                PreparedStatement stmt = db.prepareStatement(sqlStr);
+                ResultSet rs = stmt.executeQuery();
+                rs.next();
+                n = Integer.parseInt(rs.getString("count(id)"));
+            }
+            catch (Exception e) { System.out.println(e); }
+            return n;
         }
 
         private void addMenu() {
@@ -73,18 +88,22 @@ public class TabMenu extends JPanel {
                 // Limit overlap
                 if (!menuPanel.getMenu().contains(name)) {
                     try {
+                        int id = 1000 + getMenuCount();
                         String sqlStr = "insert into menu values (" +
                                 "'" + name + "', " +
+                                "" + id + ", " +
                                 "" + price + ")";
+
                         PreparedStatement stmt = db.prepareStatement(sqlStr);
                         stmt.executeUpdate();
                         stmt.close();
-                        dispose();
+                        JOptionPane.showMessageDialog(null, "등록되었습니다.");
+                        menuPanel.updateMenu();
                     }
                     catch (Exception e) {
                         System.out.println(e);
                     }
-                    menuPanel.updateMenu();
+
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "동일한 메뉴는 추가할 수 없습니다.");
@@ -140,7 +159,7 @@ public class TabMenu extends JPanel {
             ResultSet rs = stmt.executeQuery();
             rs.next();
             resultStr += "메뉴명 : " + rs.getString("name") + "\n";
-            resultStr += "가격 :  : " + rs.getString("price");
+            resultStr += "가격 : " + rs.getString("price");
             tareaMenu.setText(resultStr);
         }
         catch (Exception e){

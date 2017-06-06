@@ -17,8 +17,8 @@ public class RegisterPanel extends JPanel {
         this.setBorder(new TitledBorder("등록/조회"));
 
         tabPanel.addTab("고객", new TabCustomer(db));
-        tabPanel.addTab("매출", new TabSales());
-        tabPanel.addTab("직원", new TabStaff());
+        tabPanel.addTab("매출", new TabSales(db));
+        tabPanel.addTab("직원", new TabStaff(db));
         tabPanel.addTab("메뉴", new TabMenu(db, menuPanel));
 
         this.add(tabPanel, BorderLayout.CENTER);

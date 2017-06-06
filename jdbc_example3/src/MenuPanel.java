@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,10 +15,13 @@ public class MenuPanel extends JPanel {
     JButton menus[] = new JButton[20];
 
     private ArrayList<String> list;
+    private OrderPanel orderPanel;
     private static Connection db;
 
-    MenuPanel(Connection db) {
+
+    MenuPanel(Connection db, OrderPanel orderPanel) {
         this.db = db;
+        this.orderPanel = orderPanel;
 
         this.setBorder(new TitledBorder("메뉴"));
         this.setLayout(new GridLayout(10, 2));
@@ -54,6 +59,15 @@ public class MenuPanel extends JPanel {
         list = getMenu();
         for (int i = 0; i < list.size(); i++) {
             menus[i].setText(list.get(i));
+            menus[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    orderPanel.addOrder(((JButton) e.getSource()).getText());
+                }
+            });
+        }
+        for (int i = list.size(); i < 20; i++) {
+            menus[i].setText("");
         }
     }
 }

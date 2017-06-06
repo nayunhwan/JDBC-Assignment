@@ -33,7 +33,9 @@ public class Main extends JFrame {
     private String username = "nayunhwan";
     private String password = "dbsghks0";
 
-    private int staffId = 1000;
+    private int staffID = 1000;
+    private int customerID = 1000;
+    private int menuID = 1000;
 
     private void connectDB(){
         try{
@@ -57,21 +59,32 @@ public class Main extends JFrame {
             String sqlStr = "create table staff (" +
                     "NAME varchar2(10) Not NULL," +
                     "ID number Not NULL," +
-                    "GRADE varchar2(15) Not NULL)";
+                    "GRADE varchar2(15) Not NULL," +
+                    "SALES number Default 0)";
 
             Statement createStmt = db.createStatement();
             createStmt.executeUpdate(sqlStr);
 
             sqlStr = "create table customer (" +
                     "NAME varchar2(10) Not NULL," +
+                    "ID number Not NULL," +
                     "BIRTHDAY varchar2(10) Not NULL," +
                     "CONTACT number Not NULL," +
-                    "GRADE varchar2(20) Not NULL)";
+                    "GRADE varchar2(20) Not NULL," +
+                    "SALES number Default 0)";
             createStmt = db.createStatement();
             createStmt.executeUpdate(sqlStr);
 
             sqlStr = "create table menu (" +
-                    "NAME varchar2(30) Not NULL," +
+                    "NAME varchar2(50) Not NULL," +
+                    "ID number Not NULL," +
+                    "PRICE number Not NULL)";
+            createStmt = db.createStatement();
+            createStmt.executeUpdate(sqlStr);
+
+            sqlStr = "create table order_table (" +
+                    "TABLE_ID number Not NULL," +
+                    "MENU varchar2(50) Not NULL," +
                     "PRICE number Not NULL)";
             createStmt = db.createStatement();
             createStmt.executeUpdate(sqlStr);
@@ -102,33 +115,44 @@ public class Main extends JFrame {
             stmt = db.prepareStatement(sqlStr);
             stmt.executeUpdate();
 
+            sqlStr = "drop table order_table";
+            stmt = db.prepareStatement(sqlStr);
+            stmt.executeUpdate();
+
             stmt.close();
-            System.out.println("DONE: Drop Table");
+
         }
         catch (Exception e) {
             System.out.println(e);
+        }
+        finally {
+            System.out.println("DONE: Drop Table");
         }
     }
 
 
     private void insert(String table, String[] dataArr) {
+
+
+
         System.out.println("Insert Data to " + table.toUpperCase() + "::" + String.join(", ", dataArr));
         try {
             String sqlStr;
             PreparedStatement stmt;
             if(table.toLowerCase().equals("staff")) {
 
-                sqlStr = "insert into staff values (" +
+                sqlStr = "insert into staff(name, id, grade) values (" +
                         "'" + dataArr[0] + "', " +
-                        "" + staffId++ + ", " +
-                        "'" + dataArr[1] + "')";
+                        "" + staffID++ + ", " +
+                        "'" + dataArr[1] + "') ";
                 stmt = db.prepareStatement(sqlStr);
                 stmt.executeUpdate();
                 stmt.close();
             }
             else if(table.toLowerCase().equals("customer")) {
-                sqlStr = "insert into customer values (" +
+                sqlStr = "insert into customer(name, id, birthday, contact, grade) values (" +
                         "'" + dataArr[0] + "', " +
+                        "" + customerID++ + ", " +
                         "'" + dataArr[1] + "', " +
                         "" + dataArr[2] + ", " +
                         "'" + dataArr[3] + "')";
@@ -139,6 +163,7 @@ public class Main extends JFrame {
             else if(table.toLowerCase().equals("menu")) {
                 sqlStr = "insert into menu values (" +
                         "'" + dataArr[0] + "', " +
+                        "" + menuID++ + ", " +
                         "" + dataArr[1] + ")";
                 stmt = db.prepareStatement(sqlStr);
                 stmt.executeUpdate();
@@ -153,10 +178,11 @@ public class Main extends JFrame {
 
     public Main() {
         connectDB();
-        tablePanel = new TablePanel(db);
         orderPanel = new OrderPanel(db);
-        menuPanel = new MenuPanel(db);
+        tablePanel = new TablePanel(db, orderPanel);
+        menuPanel = new MenuPanel(db, orderPanel);
         registerPanel = new RegisterPanel(db, menuPanel);
+        orderPanel.setTablePanel(tablePanel);
 
         this.setLayout(new BorderLayout());
         openItem.setMnemonic('O');
