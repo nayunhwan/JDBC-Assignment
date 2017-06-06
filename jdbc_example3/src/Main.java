@@ -1,4 +1,5 @@
 import com.sun.deploy.panel.JavaPanel;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import javax.swing.*;
 import java.awt.MenuBar;
@@ -56,6 +57,7 @@ public class Main extends JFrame {
     private void createTable(){
         try {
             System.out.println("Create Table");
+            System.out.println("Create STAFF TABLE");
             String sqlStr = "create table staff (" +
                     "NAME varchar2(10) Not NULL," +
                     "ID number Not NULL," +
@@ -65,6 +67,7 @@ public class Main extends JFrame {
             Statement createStmt = db.createStatement();
             createStmt.executeUpdate(sqlStr);
 
+            System.out.println("Create CUSTOMER TABLE");
             sqlStr = "create table customer (" +
                     "NAME varchar2(10) Not NULL," +
                     "ID number Not NULL," +
@@ -75,6 +78,7 @@ public class Main extends JFrame {
             createStmt = db.createStatement();
             createStmt.executeUpdate(sqlStr);
 
+            System.out.println("Create MENU TABLE");
             sqlStr = "create table menu (" +
                     "NAME varchar2(50) Not NULL," +
                     "ID number Not NULL," +
@@ -82,8 +86,17 @@ public class Main extends JFrame {
             createStmt = db.createStatement();
             createStmt.executeUpdate(sqlStr);
 
+            System.out.println("Create ORDER TABLE");
             sqlStr = "create table order_table (" +
                     "TABLE_ID number Not NULL," +
+                    "MENU varchar2(50) Not NULL," +
+                    "PRICE number Not NULL)";
+            createStmt = db.createStatement();
+            createStmt.executeUpdate(sqlStr);
+
+            System.out.println("Create SALES TABLE");
+            sqlStr = "create table sales (" +
+                    "ORDER_DATE date Not NULL," +
                     "MENU varchar2(50) Not NULL," +
                     "PRICE number Not NULL)";
             createStmt = db.createStatement();
@@ -116,6 +129,10 @@ public class Main extends JFrame {
             stmt.executeUpdate();
 
             sqlStr = "drop table order_table";
+            stmt = db.prepareStatement(sqlStr);
+            stmt.executeUpdate();
+
+            sqlStr = "drop table sales";
             stmt = db.prepareStatement(sqlStr);
             stmt.executeUpdate();
 

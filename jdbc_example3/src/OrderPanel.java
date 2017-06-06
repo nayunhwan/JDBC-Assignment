@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by nayunhwan on 2017. 6. 4..
@@ -75,7 +77,7 @@ public class OrderPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 orderSendToDB();
-                tablePanel.checkTable(getTableID());
+
             }
         });
         btnCancel.setBounds(230, 220, 100, 30);
@@ -83,10 +85,15 @@ public class OrderPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearOrder();
-                tablePanel.checkTable(getTableID());
             }
         });
         btnPay.setBounds(230, 270, 100, 30);
+        btnPay.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                pay();
+            }
+        });
 
         this.add(scrollPane);
         this.add(labelTableName);
@@ -144,6 +151,7 @@ public class OrderPanel extends JPanel {
         }
         orderList = new ArrayList<>();
         tareaOrder.setText("");
+        tablePanel.checkTable(getTableID());
     }
 
     public void updateOrderView() {
@@ -151,10 +159,11 @@ public class OrderPanel extends JPanel {
         for(Order order : orderList) {
             tareaOrder.setText(tareaOrder.getText() + order.getMenu() + "\t" + order.getPrice() + "\n");
         }
-        tareaOrder.setText(tareaOrder.getText() + "\n\n\n---------------------------\n" + "총 합계\t" + getSum() + "\n");
+        int sum = getSum();
+        if(sum > 0) {
+            tareaOrder.setText(tareaOrder.getText() + "\n\n\n----------------------------------\n" + "총 합계\t" + sum + "\n");
+        }
     }
-
-
 
     public void updateOrderList(int tableID) {
         orderList = new ArrayList<>();
@@ -169,6 +178,7 @@ public class OrderPanel extends JPanel {
                 int price = Integer.parseInt(rs.getString("price"));
                 orderList.add(new Order(menu, price));
             }
+            stmt.close();
             updateOrderView();
         }
         catch (Exception e) {
@@ -176,41 +186,131 @@ public class OrderPanel extends JPanel {
         }
     }
 
-    public void orderSendToDB() {
-
+    public int getOrderCount() {
+        int n = 0;
         try {
-            String sqlStr;
-            PreparedStatement stmt = null;
-            String tableID = (String) comboTableName.getSelectedItem();
-            for(Order order : orderList) {
-                sqlStr = "insert into ORDER_TABLE values (" +
-                        "'" + tableID + "', " +
-                        "'" + order.getMenu() + "', " +
-                        "" + order.getPrice() + ")" ;
-                stmt = db.prepareStatement(sqlStr);
-                stmt.executeUpdate();
-            }
+            String sqlStr = "Select count(table_id) From ORDER_TABLE Where table_id = " + getTableID();
+            PreparedStatement stmt = db.prepareStatement(sqlStr);
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            n = rs.getInt("count(table_id)");
             stmt.close();
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+        return n;
+    }
 
+    public void orderSendToDB() {
+        try {
+
+            int n = getOrderCount();
+            if(n == orderList.size()){
+                JOptionPane.showMessageDialog(null, "새롭게 추가된 메뉴가 없습니다.");
+            }
+            else {
+                String sqlStr;
+                PreparedStatement stmt = null;
+                int tableID = getTableID();
+                for(int i = n; i < orderList.size(); i++) {
+                    Order order = orderList.get(i);
+                    sqlStr = "insert into ORDER_TABLE values (" +
+                            "" + tableID + ", " +
+                            "'" + order.getMenu() + "', " +
+                            "" + order.getPrice() + ")" ;
+                    stmt = db.prepareStatement(sqlStr);
+                    stmt.executeUpdate();
+                }
+                JOptionPane.showMessageDialog(null, "주문되었습니다.");
+                stmt.close();
+                tablePanel.checkTable(getTableID());
+            }
         }
         catch (Exception e) {
             System.out.println(e);
         }
     }
 
-    public void showTableStatus(int tableID) {
+    public String getCustomerGrade(String name) {
+        String grade = null;
         try {
-            String sqlStr = "select * from ORDER_TABLE where table table_ID = " + tableID;
+            String sqlStr = "SELECT Grade FROM Customer Where name = '" + name + "'";
+            PreparedStatement stmt = db.prepareStatement(sqlStr);
+            ResultSet rs = stmt.executeQuery();
+            rs.next();
+            grade = rs.getString("Grade");
+            stmt.close();
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+        return grade;
+    }
+
+    public double discountPercent(String name) {
+        String grade = getCustomerGrade(name);
+        double p = 1;
+        if(grade.toLowerCase().equals("gold")) { p = 0.7; }
+        else if(grade.toLowerCase().equals("silver")) { p = 0.8; }
+        else if(grade.toLowerCase().equals("bronze")) { p = 0.9; }
+        return p;
+    }
+
+    public boolean isCustomer(String name) {
+        boolean result = false;
+        try {
+            String sqlStr = "SELECT Count(name) FROM Customer WHERE name = '" + name + "'";
             PreparedStatement stmt = db.prepareStatement(sqlStr);
             ResultSet rs = stmt.executeQuery();
 
-            while(rs.next()) {
-                String resultStr = rs.getString("Table_ID") + "\t" + rs.getString("menu") + "\t" + rs.getString("price");
-                System.out.println(resultStr);
-            }
+            rs.next();
+            if(rs.getInt("Count(name)") != 0) result = true;
         }
         catch (Exception e) {
-            System.out.println(e);
+
+            System.out.println("isCustomer" + e);
+        }
+        return result;
+    }
+
+    public void pay() {
+        try {
+            String customerName = inputCustomerName.getText();
+            String sqlStr;
+            double p = 1;
+            PreparedStatement stmt = null;
+            if(!customerName.equals("") && isCustomer(customerName)) {
+                p = discountPercent(customerName);
+                int sum = Math.round((long)(getSum() * p));
+                sqlStr = "UPDATE Customer SET SALES = SALES + " + sum;
+                stmt = db.prepareStatement(sqlStr);
+                stmt.executeUpdate();
+            }
+
+            if(customerName.equals("") || (!customerName.equals("") && isCustomer(customerName))) {
+                String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+                for (Order order : orderList) {
+                    sqlStr = "INSERT into SALES values (" +
+                            "to_Date('" + date + "', 'yyyy-mm-dd'), " +
+                            "'" + order.getMenu() + "', " +
+                            "" + Math.round((long) (order.getPrice() * p)) + ")";
+                    stmt = db.prepareStatement(sqlStr);
+                    stmt.executeUpdate();
+                }
+                stmt.close();
+                JOptionPane.showMessageDialog(null, "결제되었습니다.");
+                clearOrder();
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "이름을 확인해 주세요.");
+            }
+
+
+        }
+        catch (Exception e) {
+            System.out.println("Pay: " + e);
         }
     }
+
 }

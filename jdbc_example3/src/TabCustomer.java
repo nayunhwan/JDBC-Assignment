@@ -173,6 +173,7 @@ public class TabCustomer extends JPanel {
             resultStr += "생    일 : " + rs.getString("birthday") + "\n";
             resultStr += "전화번호 : " + rs.getString("contact") + "\n";
             resultStr += "고객등급 : " + rs.getString("grade") + "\n";
+            resultStr += "총 구매금액 : " + rs.getString("sales") + "\n";
 
             tareaCustomer.setText(resultStr);
 
