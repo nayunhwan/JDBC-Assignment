@@ -58,7 +58,9 @@ public class TabSales extends JPanel {
 
     public void updateComboBoxEnable() {
         if(loginStatus != null) {
-            comboDate.setEnabled(loginStatus.getGrade().toLowerCase().equals("supervisor"));
+            boolean isSupervisor = loginStatus.getGrade().toLowerCase().equals("supervisor");
+            comboDate.setEnabled(isSupervisor);
+            if(!isSupervisor) tareaSales.setText("");
         }
         else {
             comboDate.setEnabled(false);

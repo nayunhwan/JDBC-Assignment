@@ -42,11 +42,14 @@ public class TablePanel extends JPanel {
     public void setLoginStatus(LoginStatus loginStatus) {
         this.loginStatus = loginStatus;
         if(loginStatus != null) {
+
             for(int i = 1; i <= 20; i++) {
+                System.out.println("Work");
                 tables[i].setEnabled(true);
             }
         }
         else {
+            System.out.println("??");
             for(int i = 1; i <= 20; i++) {
                 tables[i].setEnabled(false);
             }

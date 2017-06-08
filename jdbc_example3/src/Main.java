@@ -222,6 +222,9 @@ public class Main extends JFrame {
         openItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                staffID = 1000;
+                customerID = 1000;
+                menuID = 1000;
                 dropTable();
                 createTable();
                 loginStatus = null;
@@ -266,8 +269,6 @@ public class Main extends JFrame {
                         }
                         orderPanel.clearOrder();
                         menuPanel.updateMenu();
-
-                        init();
                     } catch (Exception err) {
                         System.out.println("Error: " + err);
                     }
@@ -329,7 +330,10 @@ public class Main extends JFrame {
     }
 
     public void updateLoginStatus(LoginStatus loginStatus) {
-
+        if(loginStatus == null) System.out.println("NULL");
+        else {
+            System.out.println("Login" + loginStatus.getName() + loginStatus.getGrade());
+        }
         this.loginStatus = loginStatus;
 //        System.out.println(loginStatus.getGrade());
         tablePanel.setLoginStatus(loginStatus);
