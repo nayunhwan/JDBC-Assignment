@@ -1,44 +1,67 @@
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  * Created by nayunhwan on 2017. 5. 27..
  */
 public class Login extends JFrame{
-    JLabel label_id = new JLabel();
-    JLabel label_pw = new JLabel();
-    JTextField input_id = new JTextField();
-    JPasswordField input_pw = new JPasswordField();
-    JButton btn_enter = new JButton();
-    JButton btn_find = new JButton("비밀번호 찾기");
-    JPanel pan_input = new JPanel(new GridLayout(2,2));
-    JPanel pan = new JPanel(new GridLayout(2,1));
-    JPanel pan_btn = new JPanel(new GridLayout(1,1));
-    JLabel label_noti = new JLabel();
+    JLabel labelName = new JLabel("이름");
+    JLabel labelStaffNo = new JLabel("사원번호");
 
-    public Login(){
-        setLayout(new GridLayout(2,1));
+    JTextField inputName = new JTextField();
+    JTextField inputStaffNo = new JTextField();
 
-        label_id.setText("ID");
-        label_id.setHorizontalAlignment(getWidth());
-        label_pw.setText("PW");
-        label_pw.setHorizontalAlignment(getWidth());
-        label_noti.setText("ID와 PW를 입력해주세요.");
-        label_noti.setHorizontalAlignment(getWidth());
+    JButton btnLogin = new JButton("로그인");
 
-        pan_input.add(label_id);
-        pan_input.add(input_id);
-        pan_input.add(label_pw);
-        pan_input.add(input_pw);
+    private static Connection db;
 
-        add(pan_input);
-        btn_enter.setText("Login");
-        pan.add(label_noti);
-        pan_btn.add(btn_enter);
-        pan.add(pan_btn);
-        add(pan);
+    public Login(Connection db){
+        this.db = db;
+        this.setLayout(null);
 
-        setSize(500, 200);
-        setVisible(true);
+        labelName.setBounds(15, 15, 100, 30);
+        labelStaffNo.setBounds(15, 50, 100, 30);
+        inputName.setBounds(100, 15, 100, 30);
+        inputName.setText("박수진");
+        inputStaffNo.setBounds(100, 50, 100, 30);
+        inputStaffNo.setText("1002");
+        btnLogin.setBounds(220, 30, 100, 30);
+
+        this.add(labelName);
+        this.add(labelStaffNo);
+        this.add(inputName);
+        this.add(inputStaffNo);
+        this.add(btnLogin);
+
+        this.setBounds(100, 100, 350, 130);
+        this.setTitle("사원 로그인");
+        this.setVisible(true);
+    }
+
+    public LoginStatus getloginStatus() {
+        LoginStatus loginStatus = null;
+        try {
+            String name = inputName.getText();
+            String staffNo = inputStaffNo.getText();
+
+            String sqlStr = "SELECT * FROM Staff Where name = '" + name + "' and id = " + staffNo;
+            PreparedStatement stmt = db.prepareStatement(sqlStr);
+            ResultSet rs = stmt.executeQuery();
+
+
+
+            while(rs.next()) {
+                String staffName = rs.getString("name");
+                String staffGrade = rs.getString("grade");
+                loginStatus = new LoginStatus(staffName, staffGrade);
+            }
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+        return loginStatus;
     }
 }

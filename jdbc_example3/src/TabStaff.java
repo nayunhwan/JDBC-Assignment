@@ -18,6 +18,7 @@ public class TabStaff extends JPanel {
     JButton btnFindStaff = new JButton("조회");
     JTextArea tareaStaff = new JTextArea();
 
+    private LoginStatus loginStatus = null;
     private static Connection db;
 
     private class AddStaffFrame extends JFrame {
@@ -69,6 +70,7 @@ public class TabStaff extends JPanel {
             this.setBounds(150, 150, 270, 200);
             this.setVisible(true);
         }
+
 
         private int getStaffCount() {
             String sqlStr = "Select Count(id) from staff";
@@ -131,8 +133,10 @@ public class TabStaff extends JPanel {
     TabStaff(Connection db) {
         this.db = db;
         this.setLayout(null);
+        updateBtnAddEnable();
         labelStaffName.setBounds(15, 15, 100, 30);
         inputStaffName.setBounds(15, 50, 100, 30);
+        inputStaffName.setEnabled(false);
         btnAddStaff.setBounds(150, 50, 90, 30);
         btnAddStaff.addActionListener(new ActionListener() {
             @Override
@@ -141,12 +145,14 @@ public class TabStaff extends JPanel {
             }
         });
         btnFindStaff.setBounds(250, 50, 60, 30);
+        btnFindStaff.setEnabled(false);
         btnFindStaff.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 findStaff();
             }
         });
+        tareaStaff.setEditable(false);
         tareaStaff.setBounds(15, 90, 300, 200);
         tareaStaff.setBorder(new LineBorder(Color.gray, 2));
         this.add(labelStaffName);
@@ -154,6 +160,28 @@ public class TabStaff extends JPanel {
         this.add(btnAddStaff);
         this.add(btnFindStaff);
         this.add(tareaStaff);
+    }
+
+    public void setLoginStatus(LoginStatus loginStatus) {
+        this.loginStatus = loginStatus;
+        if(loginStatus != null) {
+            inputStaffName.setEnabled(true);
+            btnFindStaff.setEnabled(true);
+        }
+        else {
+            inputStaffName.setEnabled(false);
+            btnFindStaff.setEnabled(false);
+        }
+        updateBtnAddEnable();
+    }
+
+    public void updateBtnAddEnable() {
+        if(loginStatus != null) {
+            btnAddStaff.setEnabled(loginStatus.getGrade().toLowerCase().equals("supervisor"));
+        }
+        else {
+            btnAddStaff.setEnabled(false);
+        }
     }
 
     private void findStaff() {
@@ -176,4 +204,6 @@ public class TabStaff extends JPanel {
             tareaStaff.setText("검색 결과 없음");
         }
     }
+
+
 }

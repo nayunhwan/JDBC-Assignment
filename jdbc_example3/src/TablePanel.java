@@ -15,6 +15,7 @@ public class TablePanel extends JPanel {
 
     private OrderPanel orderPanel;
     private static Connection db;
+    private LoginStatus loginStatus = null;
 
     public TablePanel(Connection db, OrderPanel orderPanel) {
         this.db = db;
@@ -30,9 +31,25 @@ public class TablePanel extends JPanel {
                     int tableID = Integer.parseInt(((JButton)e.getSource()).getText());
                     orderPanel.comboTableName.setSelectedItem(String.valueOf(tableID));
                     orderPanel.updateOrderList(tableID);
+                    orderPanel.updateBtnEnable();
                 }
             });
             this.add(tables[i]);
+        }
+        setLoginStatus(loginStatus);
+
+    }
+    public void setLoginStatus(LoginStatus loginStatus) {
+        this.loginStatus = loginStatus;
+        if(loginStatus != null) {
+            for(int i = 1; i <= 20; i++) {
+                tables[i].setEnabled(true);
+            }
+        }
+        else {
+            for(int i = 1; i <= 20; i++) {
+                tables[i].setEnabled(false);
+            }
         }
     }
 

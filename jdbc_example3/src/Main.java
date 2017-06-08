@@ -1,6 +1,8 @@
 import com.sun.deploy.panel.JavaPanel;
 import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+import sun.rmi.runtime.Log;
 
+import javax.net.ssl.SSLContext;
 import javax.swing.*;
 import java.awt.MenuBar;
 import javax.swing.border.LineBorder;
@@ -37,6 +39,8 @@ public class Main extends JFrame {
     private int staffID = 1000;
     private int customerID = 1000;
     private int menuID = 1000;
+
+    private LoginStatus loginStatus = null;
 
     private void connectDB(){
         try{
@@ -150,8 +154,6 @@ public class Main extends JFrame {
 
     private void insert(String table, String[] dataArr) {
 
-
-
         System.out.println("Insert Data to " + table.toUpperCase() + "::" + String.join(", ", dataArr));
         try {
             String sqlStr;
@@ -167,12 +169,21 @@ public class Main extends JFrame {
                 stmt.close();
             }
             else if(table.toLowerCase().equals("customer")) {
-                sqlStr = "insert into customer(name, id, birthday, contact, grade) values (" +
+
+                sqlStr = "insert into customer values (" +
                         "'" + dataArr[0] + "', " +
                         "" + customerID++ + ", " +
                         "'" + dataArr[1] + "', " +
                         "" + dataArr[2] + ", " +
-                        "'" + dataArr[3] + "')";
+                        "'" + dataArr[3] + "', ";
+
+                int initSales = 0;
+                if(dataArr[3].toLowerCase().equals("gold")) initSales = 1000000;
+                else if(dataArr[3].toLowerCase().equals("silver")) initSales = 500000;
+                else if(dataArr[3].toLowerCase().equals("bronze")) initSales = 300000;
+
+                sqlStr += initSales + ")";
+
                 stmt = db.prepareStatement(sqlStr);
                 stmt.executeUpdate();
                 stmt.close();
@@ -192,14 +203,18 @@ public class Main extends JFrame {
         }
     }
 
-
-    public Main() {
-        connectDB();
+    public void init() {
         orderPanel = new OrderPanel(db);
         tablePanel = new TablePanel(db, orderPanel);
         menuPanel = new MenuPanel(db, orderPanel);
         registerPanel = new RegisterPanel(db, menuPanel);
         orderPanel.setTablePanel(tablePanel);
+        orderPanel.setTabSales(registerPanel.getTabSales());
+    }
+
+    public Main() {
+        connectDB();
+        init();
 
         this.setLayout(new BorderLayout());
         openItem.setMnemonic('O');
@@ -209,6 +224,8 @@ public class Main extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dropTable();
                 createTable();
+                loginStatus = null;
+                updateLoginStatus(null);
                 JFileChooser filechooser = new JFileChooser();
                 int ret = filechooser.showOpenDialog(null);
 
@@ -244,7 +261,13 @@ public class Main extends JFrame {
                             insert("menu", dataArr);
                         }
 
+                        for(int i = 0; i < 20; i++) {
+                            tablePanel.checkTable(i+1);
+                        }
+                        orderPanel.clearOrder();
                         menuPanel.updateMenu();
+
+                        init();
                     } catch (Exception err) {
                         System.out.println("Error: " + err);
                     }
@@ -252,6 +275,28 @@ public class Main extends JFrame {
             }
         });
 
+        loginItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Login login = new Login(db);
+                login.btnLogin.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        LoginStatus newloginStatus = login.getloginStatus();
+                        if(newloginStatus != null) {
+                            System.out.println(newloginStatus.getGrade());
+                            updateLoginStatus(newloginStatus);
+                            JOptionPane.showMessageDialog(null, newloginStatus.getName() + "님으로 로그인되었습니다.");
+                            login.dispose();
+                        }
+                        else {
+                            JOptionPane.showMessageDialog(null, "로그인 실패");
+                        }
+
+                    }
+                });
+            }
+        });
         loginItem.setMnemonic('L');
 
         menu.add(openItem);
@@ -283,6 +328,15 @@ public class Main extends JFrame {
         setVisible(true);
     }
 
+    public void updateLoginStatus(LoginStatus loginStatus) {
+
+        this.loginStatus = loginStatus;
+//        System.out.println(loginStatus.getGrade());
+        tablePanel.setLoginStatus(loginStatus);
+        orderPanel.setLoginStatus(loginStatus);
+        menuPanel.setLoginStatus(loginStatus);
+        registerPanel.setLoginStatus(loginStatus);
+    }
     public static void main(String[] args) {
 
         Main m = new Main();

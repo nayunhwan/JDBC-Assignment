@@ -27,8 +27,10 @@ public class OrderPanel extends JPanel {
 
 
     private TablePanel tablePanel;
+    private TabSales tabSales;
 
     private static Connection db;
+    private LoginStatus loginStatus = null;
     private ArrayList<Order> orderList = new ArrayList<>();
 
     private class Order {
@@ -43,7 +45,6 @@ public class OrderPanel extends JPanel {
         public String getMenu() {
             return this.menu;
         }
-
         public int getPrice() {
             return this.price;
         }
@@ -59,7 +60,7 @@ public class OrderPanel extends JPanel {
         for (int i = 0; i < 20; i++) {
             comboTableName.addItem((i + 1) +"");
         }
-
+        setLoginStatus(loginStatus);
         scrollPane.setBounds(15, 18, 200, 330);
         labelCustomerName.setBounds(230, 15, 100, 30);
         inputCustomerName.setBounds(230, 50, 100, 30);
@@ -69,10 +70,12 @@ public class OrderPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int tableID = Integer.parseInt((String)((JComboBox)e.getSource()).getSelectedItem());
+
                 updateOrderList(tableID);
             }
         });
         btnOrder.setBounds(230, 170, 100, 30);
+        btnOrder.setEnabled(false);
         btnOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,17 +84,21 @@ public class OrderPanel extends JPanel {
             }
         });
         btnCancel.setBounds(230, 220, 100, 30);
+        btnCancel.setEnabled(false);
         btnCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 clearOrder();
+
             }
         });
         btnPay.setBounds(230, 270, 100, 30);
+        btnPay.setEnabled(false);
         btnPay.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pay();
+                tabSales.updateSalesView();
             }
         });
 
@@ -108,6 +115,23 @@ public class OrderPanel extends JPanel {
     public void setTablePanel(TablePanel tablePanel) {
         this.tablePanel = tablePanel;
     }
+    public void setTabSales(TabSales tabSales) {
+        this.tabSales = tabSales;
+    }
+    public void setLoginStatus(LoginStatus loginStatus){
+        this.loginStatus = loginStatus;
+        if(loginStatus != null) {
+            inputCustomerName.setEnabled(true);
+            comboTableName.setEnabled(true);
+            btnOrder.setEnabled(true);
+        }
+        else {
+            inputCustomerName.setEnabled(false);
+            comboTableName.setEnabled(false);
+            btnOrder.setEnabled(false);
+        }
+        updateBtnEnable();
+    }
 
     public int getSum() {
         int sum = 0;
@@ -121,6 +145,17 @@ public class OrderPanel extends JPanel {
         return Integer.parseInt((String)comboTableName.getSelectedItem());
     }
 
+    public void updateBtnEnable() {
+        if(orderList.size() > 0) {
+            btnCancel.setEnabled(true);
+            btnPay.setEnabled(true);
+        }
+        else {
+            btnCancel.setEnabled(false);
+            btnPay.setEnabled(false);
+        }
+    }
+
     public void addOrder(String menu) {
         try {
 
@@ -131,6 +166,7 @@ public class OrderPanel extends JPanel {
             int price = Integer.parseInt(rs.getString("price"));
             orderList.add(new Order(menu, price));
             stmt.close();
+
             updateOrderView();
         }
         catch (Exception e) {
@@ -145,13 +181,15 @@ public class OrderPanel extends JPanel {
             PreparedStatement stmt = db.prepareStatement(sqlStr);
             stmt.executeUpdate();
             stmt.close();
+            orderList = new ArrayList<>();
+            updateBtnEnable();
+            tareaOrder.setText("");
+            tablePanel.checkTable(getTableID());
         }
         catch (Exception e) {
             System.out.println("e");
         }
-        orderList = new ArrayList<>();
-        tareaOrder.setText("");
-        tablePanel.checkTable(getTableID());
+
     }
 
     public void updateOrderView() {
@@ -224,7 +262,9 @@ public class OrderPanel extends JPanel {
                 }
                 JOptionPane.showMessageDialog(null, "주문되었습니다.");
                 stmt.close();
+                updateBtnEnable();
                 tablePanel.checkTable(getTableID());
+
             }
         }
         catch (Exception e) {
@@ -280,14 +320,19 @@ public class OrderPanel extends JPanel {
             String sqlStr;
             double p = 1;
             PreparedStatement stmt = null;
+            int sum = getSum();
             if(!customerName.equals("") && isCustomer(customerName)) {
                 p = discountPercent(customerName);
-                int sum = Math.round((long)(getSum() * p));
+                sum = Math.round((long)(getSum() * p));
                 sqlStr = "UPDATE Customer SET SALES = SALES + " + sum;
                 stmt = db.prepareStatement(sqlStr);
                 stmt.executeUpdate();
             }
-
+            if(loginStatus != null) {
+                sqlStr = "UPDATE Staff SET SALES = SALES + " + sum;
+                stmt = db.prepareStatement(sqlStr);
+                stmt.executeUpdate();
+            }
             if(customerName.equals("") || (!customerName.equals("") && isCustomer(customerName))) {
                 String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
                 for (Order order : orderList) {
@@ -301,6 +346,7 @@ public class OrderPanel extends JPanel {
                 stmt.close();
                 JOptionPane.showMessageDialog(null, "결제되었습니다.");
                 clearOrder();
+                updateBtnEnable();
             }
             else {
                 JOptionPane.showMessageDialog(null, "이름을 확인해 주세요.");

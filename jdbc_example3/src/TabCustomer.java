@@ -18,6 +18,7 @@ public class TabCustomer extends JPanel {
     JButton btnSign = new JButton("가입");
     JButton btnFind = new JButton("조회");
 
+    private LoginStatus loginStatus;
     private static Connection db;
 
     private class SignCustomerFrame extends JFrame {
@@ -133,8 +134,12 @@ public class TabCustomer extends JPanel {
     TabCustomer(Connection db) {
         this.db = db;
         this.setLayout(null);
+        updateBtnAddEnable();
         labelCustomerName.setBounds(15, 15, 100, 30);
         inputCustomerName.setBounds(15, 50, 100, 30);
+        inputCustomerName.setEnabled(false);
+
+        tareaCustomer.setEnabled(false);
         tareaCustomer.setBounds(15, 90, 300, 200);
         tareaCustomer.setBorder(new LineBorder(Color.gray, 2));
 
@@ -145,7 +150,9 @@ public class TabCustomer extends JPanel {
                 SignCustomerFrame signCustomerFrame = new SignCustomerFrame();
             }
         });
+
         btnFind.setBounds(250, 50, 60, 30);
+        btnFind.setEnabled(false);
         btnFind.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -157,6 +164,28 @@ public class TabCustomer extends JPanel {
         this.add(btnSign);
         this.add(btnFind);
         this.add(tareaCustomer);
+    }
+
+    public void setLoginStatus(LoginStatus loginStatus) {
+        this.loginStatus = loginStatus;
+        if(loginStatus != null) {
+            btnFind.setEnabled(true);
+            inputCustomerName.setEnabled(true);
+        }
+        else {
+            btnFind.setEnabled(false);
+            inputCustomerName.setEnabled(false);
+        }
+        updateBtnAddEnable();
+    }
+
+    public void updateBtnAddEnable() {
+        if(loginStatus != null) {
+            btnSign.setEnabled(loginStatus.getGrade().toLowerCase().equals("supervisor"));
+        }
+        else {
+            btnSign.setEnabled(false);
+        }
     }
 
     private void findCustomer() {

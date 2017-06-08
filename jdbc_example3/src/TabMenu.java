@@ -18,6 +18,8 @@ public class TabMenu extends JPanel {
     JButton btnFindMenu = new JButton("조회");
     JTextArea tareaMenu = new JTextArea();
 
+    private LoginStatus loginStatus = null;
+
     private static Connection db;
     private MenuPanel menuPanel;
 
@@ -118,11 +120,13 @@ public class TabMenu extends JPanel {
     TabMenu(Connection db, MenuPanel menuPanel) {
         this.db = db;
         this.menuPanel = menuPanel;
-
         this.setLayout(null);
+
+        updateBtnAddEnable();
 
         labelMenuName.setBounds(15, 15, 100, 30);
         inputMenuName.setBounds(15, 50, 120, 30);
+        inputMenuName.setEnabled(false);
         btnAddMenu.setBounds(150, 50, 90, 30);
         btnAddMenu.addActionListener(new ActionListener() {
             @Override
@@ -132,6 +136,7 @@ public class TabMenu extends JPanel {
         });
 
         btnFindMenu.setBounds(250, 50, 60, 30);
+        btnFindMenu.setEnabled(false);
         btnFindMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -147,6 +152,28 @@ public class TabMenu extends JPanel {
         this.add(btnAddMenu);
         this.add(btnFindMenu);
         this.add(tareaMenu);
+    }
+
+    public void setLoginStatus(LoginStatus loginStatus) {
+        this.loginStatus = loginStatus;
+        if(loginStatus != null) {
+            inputMenuName.setEnabled(true);
+            btnFindMenu.setEnabled(true);
+        }
+        else {
+            inputMenuName.setEnabled(false);
+            btnFindMenu.setEnabled(false);
+        }
+        updateBtnAddEnable();
+    }
+
+    public void updateBtnAddEnable() {
+        if(loginStatus != null) {
+            btnAddMenu.setEnabled(loginStatus.getGrade().toLowerCase().equals("supervisor"));
+        }
+        else {
+            btnAddMenu.setEnabled(false);
+        }
     }
 
     private void findMenu() {

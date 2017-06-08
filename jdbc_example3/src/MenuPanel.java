@@ -16,20 +16,34 @@ public class MenuPanel extends JPanel {
 
     private ArrayList<String> list;
     private OrderPanel orderPanel;
+    private LoginStatus loginStatus = null;
     private static Connection db;
-
 
     MenuPanel(Connection db, OrderPanel orderPanel) {
         this.db = db;
         this.orderPanel = orderPanel;
-
         this.setBorder(new TitledBorder("메뉴"));
         this.setLayout(new GridLayout(10, 2));
         for (int i = 0; i < 20; i++) {
             menus[i] = new JButton();
+            menus[i].setEnabled(false);
             this.add(menus[i]);
         }
         updateMenu();
+    }
+
+    public void setLoginStatus(LoginStatus loginStatus) {
+        this.loginStatus = loginStatus;
+        if(loginStatus != null) {
+            for(JButton menu : menus) {
+                menu.setEnabled(true);
+            }
+        }
+        else {
+            for(JButton menu : menus) {
+                menu.setEnabled(false);
+            }
+        }
     }
 
     public ArrayList<String> getMenu() {
