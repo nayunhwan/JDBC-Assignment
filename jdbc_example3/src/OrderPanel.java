@@ -26,8 +26,9 @@ public class OrderPanel extends JPanel {
     JButton btnPay = new JButton("결제");
 
 
-    private TablePanel tablePanel;
-    private TabSales tabSales;
+    private RegisterPanel registerPanel = null;
+    private TablePanel tablePanel = null;
+    private TabSales tabSales = null;
 
     private static Connection db;
     private LoginStatus loginStatus = null;
@@ -118,6 +119,8 @@ public class OrderPanel extends JPanel {
     public void setTabSales(TabSales tabSales) {
         this.tabSales = tabSales;
     }
+    public void setRegisterPanel(RegisterPanel registerPanel) { this.registerPanel = registerPanel; }
+
     public void setLoginStatus(LoginStatus loginStatus){
         this.loginStatus = loginStatus;
         if(loginStatus != null) {

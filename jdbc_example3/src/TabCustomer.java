@@ -139,7 +139,7 @@ public class TabCustomer extends JPanel {
         inputCustomerName.setBounds(15, 50, 100, 30);
         inputCustomerName.setEnabled(false);
 
-        tareaCustomer.setEnabled(false);
+        tareaCustomer.setEditable(false);
         tareaCustomer.setBounds(15, 90, 300, 200);
         tareaCustomer.setBorder(new LineBorder(Color.gray, 2));
 

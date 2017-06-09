@@ -27,6 +27,12 @@ public class MenuPanel extends JPanel {
         for (int i = 0; i < 20; i++) {
             menus[i] = new JButton();
             menus[i].setEnabled(false);
+            menus[i].addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    orderPanel.addOrder(((JButton) e.getSource()).getText());
+                }
+            });
             this.add(menus[i]);
         }
         updateMenu();
@@ -36,7 +42,7 @@ public class MenuPanel extends JPanel {
         this.loginStatus = loginStatus;
         if(loginStatus != null) {
             for(JButton menu : menus) {
-                menu.setEnabled(true);
+                if(!menu.getText().equals("")) menu.setEnabled(true);
             }
         }
         else {
@@ -60,7 +66,7 @@ public class MenuPanel extends JPanel {
             }
         }
         catch (Exception e) {
-
+            System.out.println(e);
         }
         return list;
     }
@@ -73,15 +79,11 @@ public class MenuPanel extends JPanel {
         list = getMenu();
         for (int i = 0; i < list.size(); i++) {
             menus[i].setText(list.get(i));
-            menus[i].addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    orderPanel.addOrder(((JButton) e.getSource()).getText());
-                }
-            });
+            if(loginStatus != null) menus[i].setEnabled(true);
         }
         for (int i = list.size(); i < 20; i++) {
             menus[i].setText("");
+            menus[i].setEnabled(false);
         }
     }
 }

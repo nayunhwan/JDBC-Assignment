@@ -42,9 +42,7 @@ public class TablePanel extends JPanel {
     public void setLoginStatus(LoginStatus loginStatus) {
         this.loginStatus = loginStatus;
         if(loginStatus != null) {
-
             for(int i = 1; i <= 20; i++) {
-                System.out.println("Work");
                 tables[i].setEnabled(true);
             }
         }
@@ -56,6 +54,11 @@ public class TablePanel extends JPanel {
         }
     }
 
+    public void checkAllTable() {
+        for(int i = 1; i <= 20; i++){
+            checkTable(i);
+        }
+    }
     public void checkTable(int n) {
         try {
             String sqlStr = "Select count(table_id) from order_table where table_id = " + n;

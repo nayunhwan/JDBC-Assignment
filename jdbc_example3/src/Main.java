@@ -208,6 +208,7 @@ public class Main extends JFrame {
         tablePanel = new TablePanel(db, orderPanel);
         menuPanel = new MenuPanel(db, orderPanel);
         registerPanel = new RegisterPanel(db, menuPanel);
+        orderPanel.setRegisterPanel(registerPanel);
         orderPanel.setTablePanel(tablePanel);
         orderPanel.setTabSales(registerPanel.getTabSales());
     }
@@ -222,18 +223,19 @@ public class Main extends JFrame {
         openItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                staffID = 1000;
-                customerID = 1000;
-                menuID = 1000;
-                dropTable();
-                createTable();
-                loginStatus = null;
-                updateLoginStatus(null);
+
                 JFileChooser filechooser = new JFileChooser();
                 int ret = filechooser.showOpenDialog(null);
 
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     try (BufferedReader br = new BufferedReader(new FileReader(filechooser.getSelectedFile()))) {
+                        staffID = 1000;
+                        customerID = 1000;
+                        menuID = 1000;
+                        dropTable();
+                        createTable();
+                        loginStatus = null;
+                        updateLoginStatus(null);
                         String text = null;
 
                         text = br.readLine();
@@ -264,9 +266,7 @@ public class Main extends JFrame {
                             insert("menu", dataArr);
                         }
 
-                        for(int i = 0; i < 20; i++) {
-                            tablePanel.checkTable(i+1);
-                        }
+                        tablePanel.checkAllTable();
                         orderPanel.clearOrder();
                         menuPanel.updateMenu();
                     } catch (Exception err) {
