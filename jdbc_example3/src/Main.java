@@ -330,12 +330,7 @@ public class Main extends JFrame {
     }
 
     public void updateLoginStatus(LoginStatus loginStatus) {
-        if(loginStatus == null) System.out.println("NULL");
-        else {
-            System.out.println("Login" + loginStatus.getName() + loginStatus.getGrade());
-        }
         this.loginStatus = loginStatus;
-//        System.out.println(loginStatus.getGrade());
         tablePanel.setLoginStatus(loginStatus);
         orderPanel.setLoginStatus(loginStatus);
         menuPanel.setLoginStatus(loginStatus);

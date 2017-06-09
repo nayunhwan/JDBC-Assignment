@@ -47,7 +47,6 @@ public class TablePanel extends JPanel {
             }
         }
         else {
-            System.out.println("??");
             for(int i = 1; i <= 20; i++) {
                 tables[i].setEnabled(false);
             }

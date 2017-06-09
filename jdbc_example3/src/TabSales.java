@@ -76,7 +76,6 @@ public class TabSales extends JPanel {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 comboDate.addItem(rs.getString("Order_date").substring(0, 10));
-                System.out.println(rs.getString("Order_date").substring(0, 10));
             }
         }
         catch (Exception e) {
