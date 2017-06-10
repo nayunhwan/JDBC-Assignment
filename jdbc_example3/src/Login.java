@@ -25,9 +25,7 @@ public class Login extends JFrame{
         labelName.setBounds(15, 15, 100, 30);
         labelStaffNo.setBounds(15, 50, 100, 30);
         inputName.setBounds(100, 15, 100, 30);
-        inputName.setText("박수진");
         inputStaffNo.setBounds(100, 50, 100, 30);
-        inputStaffNo.setText("1002");
         btnLogin.setBounds(220, 30, 100, 30);
 
         this.add(labelName);

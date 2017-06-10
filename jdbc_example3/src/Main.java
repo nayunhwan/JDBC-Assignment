@@ -1,7 +1,3 @@
-import com.sun.deploy.panel.JavaPanel;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
-import sun.rmi.runtime.Log;
-
 import javax.net.ssl.SSLContext;
 import javax.swing.*;
 import java.awt.MenuBar;
@@ -16,7 +12,7 @@ import java.util.ArrayList;
 
 public class Main extends JFrame {
 
-    private JLabel title = new JLabel("식당 주문관리");
+    private JLabel title = new JLabel("�떇�떦 二쇰Ц愿�由�");
     private JPanel titlePanel = new JPanel();
     private JFrame frame = new JFrame();
 
@@ -33,8 +29,6 @@ public class Main extends JFrame {
     private RegisterPanel registerPanel;
 
     private static Connection db;
-    private String username = "nayunhwan";
-    private String password = "dbsghks0";
 
     private int staffID = 1000;
     private int customerID = 1000;
@@ -42,7 +36,7 @@ public class Main extends JFrame {
 
     private LoginStatus loginStatus = null;
 
-    private void connectDB(){
+    public void connectDB(String username, String password){
         try{
             // JDBC Driver Loading
             Class.forName("oracle.jdbc.OracleDriver");
@@ -213,8 +207,8 @@ public class Main extends JFrame {
         orderPanel.setTabSales(registerPanel.getTabSales());
     }
 
-    public Main() {
-        connectDB();
+    public Main(String username, String password) {
+        connectDB(username, password);
         init();
 
         this.setLayout(new BorderLayout());
@@ -287,11 +281,11 @@ public class Main extends JFrame {
                         if(newloginStatus != null) {
                             System.out.println(newloginStatus.getGrade());
                             updateLoginStatus(newloginStatus);
-                            JOptionPane.showMessageDialog(null, newloginStatus.getName() + "님으로 로그인되었습니다.");
+                            JOptionPane.showMessageDialog(null, newloginStatus.getName() + "�떂�쑝濡� 濡쒓렇�씤�릺�뿀�뒿�땲�떎.");
                             login.dispose();
                         }
                         else {
-                            JOptionPane.showMessageDialog(null, "로그인 실패");
+                            JOptionPane.showMessageDialog(null, "濡쒓렇�씤 �떎�뙣");
                         }
 
                     }
@@ -336,9 +330,5 @@ public class Main extends JFrame {
         menuPanel.setLoginStatus(loginStatus);
         registerPanel.setLoginStatus(loginStatus);
     }
-    public static void main(String[] args) {
 
-        Main m = new Main();
-//        Login login = new Login();
-    }
 }
