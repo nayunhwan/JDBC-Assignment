@@ -327,12 +327,12 @@ public class OrderPanel extends JPanel {
             if(!customerName.equals("") && isCustomer(customerName)) {
                 p = discountPercent(customerName);
                 sum = Math.round((long)(getSum() * p));
-                sqlStr = "UPDATE Customer SET SALES = SALES + " + sum;
+                sqlStr = "UPDATE Customer SET SALES = SALES + " + sum + " WHERE name = '" + customerName + "'";
                 stmt = db.prepareStatement(sqlStr);
                 stmt.executeUpdate();
             }
             if(loginStatus != null) {
-                sqlStr = "UPDATE Staff SET SALES = SALES + " + sum;
+                sqlStr = "UPDATE Staff SET SALES = SALES + " + sum + " WHERE name = '" + loginStatus.getName() + "'";
                 stmt = db.prepareStatement(sqlStr);
                 stmt.executeUpdate();
             }
